@@ -188,12 +188,14 @@ void move_to_waiting_queue(struct Job *job){
 void request_devices(int jobNum, int numDevices){
 	for(int i=0; i<numJobs; i++){
 		if(all_jobs[i]->number == jobNum){
-			if(all_jobs[i]->status == 'R'){
-				(all_jobs[i]->maxDemand < availableDevices) ?
-						availableDevices -= all_jobs[i]->maxDemand:
-						printf("not enough devices available \n");
+			if(all_jobs[i]->status == 'R' && all_jobs[i]->maxDemand < availableDevices){
+				printf("\n%d devices successfully requested by job %d\n", numDevices, jobNum);
+				availableDevices -= numDevices;
+				printf("%d devices left \n", availableDevices);
+				printf("job %d beginning execution \n", jobNum);
+				executeJob(all_jobs[i]);
 			}else{
-				printf("job %d is not in ready queue; request ignored \n", jobNum);
+				printf("\nrequest by job %d ignored \n", jobNum);
 			}
 		}
 	}
@@ -205,18 +207,13 @@ void release_devices(int jobNum, int numDevices){
 		if(all_jobs[i]->number == jobNum){
 			if(all_jobs[i]->status == 'T'){
 				availableDevices += numDevices;
+				printf("%d devices successfully release from job %d\n", numDevices, jobNum);
 			}else{
 				printf("release is invalid, release ignored \n");
 			}
 		}
 	}
 }
-
-/*struct Job* pick_from_holding(){
-	struct Job* temp_hq1 = root_job_holding1;
-	struct Job* temp_hq2 = root_job_holding2;
-
-}*/
 
 void jobScheduler(struct Job *job){
 	if(job->memUnits > mainMemSize || job->maxDemand > numSerialDevices){//reject the job
@@ -237,22 +234,28 @@ void jobScheduler(struct Job *job){
 	}
 }
 
+//TODO currently testing request devices from jobs that are READY (not executing)
+
 //Given a job from the ready queue, execute the job
 //Terminate job after execution
-/*void executeJob(struct Job *job){
+void executeJob(struct Job *job){
+	job->status = 'E';
 	availableMainMem = availableMainMem - job->memUnits;
 	terminateJob(job);
 }
 
 void terminateJob(struct Job *job){
-	change_job_status(job, 'T');
+	job->status = 'T';
 	if(root_job_terminated == NULL){
 		root_job_terminated = job;
+		job->next_Job = NULL;
 	}else{
 		job->next_Job = root_job_terminated;
 		job->prev_Job = job;
 	}
 	availableMainMem = job->memUnits + availableMainMem;
+	release_devices(job->number, job->maxDemand);
+/*	//TODO release devices
 
 	//holding queue 1 has higher priority, check this queue first
 	struct Job *tmp = root_job_holding1;
@@ -270,8 +273,8 @@ void terminateJob(struct Job *job){
 		if(tmp->memUnits <= availableMainMem){
 			executeJob(tmp);
 		}
-	}
-}*/
+	}*/
+}
 
 void print_all_jobs(){
 	for(int i=0; i<numJobs; i++){
@@ -282,8 +285,8 @@ void print_all_jobs(){
 
 void print_queue(struct Job *job){
 	while(job->next_Job != NULL){
-		printf(job->number);
-		printf(job->status);
+		printf("%d\n", job->number);
+		printf("%c\n",job->status);
 		job = job->next_Job;
 	}
 }
@@ -295,19 +298,14 @@ int main(void){
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
 	create_new_job(3, 9, 10, 8, 4, 1);
-
 	request_devices(1, 5);
-
 	create_new_job(4, 13, 20, 4, 11, 2);
-
 	request_devices(3, 2);
-
 	create_new_job(5, 24, 20, 10, 9, 1);
-	/*
-	jobScheduler(all_jobs[4]);
-
 	create_new_job(6, 25, 20, 4, 12, 2);
-	jobScheduler(all_jobs[5]);*/
+	request_devices(4, 4);
+	request_devices(5, 7);
+	release_devices(3, 2);
 
 	printf("\n ------------------ \n");
 	printf("printing all jobs \n");
@@ -316,9 +314,7 @@ int main(void){
 	for(int i=0; i<numJobs; i++){
 		printf("\nprinting job %d", all_jobs[i]->number);
 		printf("\njob status: %c \n", all_jobs[i]->status);
-		//jobScheduler(all_jobs[i]);
 	}
-
 	return 0;
 }
 
