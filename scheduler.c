@@ -14,6 +14,7 @@
 
 //define Job (before being processed)
 struct Job{
+	int number; //job number (identifier)
 	int time; //time job arrives
 	int memUnits; //mem units required
 	int maxDemand; //max device demand
@@ -36,6 +37,7 @@ int simStartTime; //system simulated start time
 int mainMemSize; //size of system main memory
 int availableMainMem; //size of available system main memory
 int numSerialDevices; //number of serial devices on system
+int availableDevices; //number of devices available
 int timeSlice; //size of system time slice
 
 struct Job* root_job_ready; //first job in ready queue
@@ -63,6 +65,7 @@ void start_system(int time, int memSize, int serialDevices, int quantum){
 	mainMemSize = memSize;
 	availableMainMem = mainMemSize;
 	numSerialDevices = serialDevices;
+	availableDevices = numSerialDevices;
 	timeSlice = quantum;
 
 	//all lists are empty (no jobs)
@@ -73,11 +76,14 @@ void start_system(int time, int memSize, int serialDevices, int quantum){
 	root_job_terminated = NULL;
 
 	printf("System started \n");
+	printf("total memory: %d \n", mainMemSize);
+	printf("memory available: %d \n", availableMainMem);
 }
 
 //create a new job from user input
-void create_new_job(int time, int memUnits, int maxDemand, int timeRun, int priority){
+void create_new_job(int jobNum, int time, int memUnits, int maxDemand, int timeRun, int priority){
 	struct Job* new_job = malloc(sizeof(*new_job));
+	new_job->number = jobNum;
 	new_job->time = time;
 	new_job->memUnits = memUnits;
 	new_job->maxDemand = maxDemand;
@@ -88,7 +94,9 @@ void create_new_job(int time, int memUnits, int maxDemand, int timeRun, int prio
 	all_jobs[numJobs] = new_job; //add to all jobs array
 	numJobs++; //increase the total number of jobs in the system
 
-	printf("New job created \n");
+	printf("\nJob %d created \n", new_job->number);
+
+	jobScheduler(new_job);
 }
 
 void first_in_first_out(struct Job *job, struct Job *queueRoot){
@@ -105,9 +113,10 @@ void first_in_first_out(struct Job *job, struct Job *queueRoot){
 void shortest_job_first(struct Job *job, struct Job *queueRoot){
 	struct Job *tmp = queueRoot;
 	if(job->timeRun < tmp->timeRun){
-		job->next_Job = tmp;
 		tmp->prev_Job = job;
-		printf("holding queue 1 is empty \n");
+		job->next_Job = tmp;
+		job->prev_Job = NULL;
+		printf("new job added to top of holding queue 1\n");
 	}else if(job->timeRun > tmp->timeRun){
 		while(job->timeRun > tmp->timeRun){
 			tmp = tmp->next_Job;
@@ -129,32 +138,33 @@ void shortest_job_first(struct Job *job, struct Job *queueRoot){
 
 void move_to_holding_q1(struct Job *job){
 	if(root_job_holding1 == NULL){
-		printf("root_job_holding1 is null \n");
 		root_job_holding1 = job;
 		root_job_holding1->next_Job = NULL;
 		root_job_holding1->prev_Job = NULL;
+		printf("first job in holding queue 1 \n");
 	}else{
 		shortest_job_first(job, root_job_holding1);
 	}
-	printf("added to holding queue 1 \n");
+	job->status = 'H';
+	printf("successfully added to holding queue 1 \n");
 }
 
 void move_to_holding_q2(struct Job *job){
 	if(root_job_holding2 == NULL){
-		printf("root_job_holding2 is null \n");
+		printf("first job in holding queue 2 \n");
 		root_job_holding2 = job;
 		root_job_holding2->next_Job = NULL;
 		root_job_holding2->prev_Job = NULL;
 	}else{
 		first_in_first_out(job, root_job_holding2);
 	}
+	job->status = 'H';
 	printf("added to holding queue 2 \n");
 }
 
 void move_to_ready_queue(struct Job *job){
 	//no jobs in the ready queue
 	if(root_job_ready == NULL){
-		printf("root job ready is null \n");
 		root_job_ready = job;
 		root_job_ready->next_Job = NULL;
 		root_job_ready->prev_Job = NULL;
@@ -167,19 +177,39 @@ void move_to_ready_queue(struct Job *job){
 		job->prev_Job = tmp;
 	}
 	availableMainMem -= job->memUnits;
-	printf("added to ready queue \n");
+	job->status = 'R';
+	printf("successfully added to ready queue \n");
 }
 
 void move_to_waiting_queue(struct Job *job){
 
 }
 
-void request_devices(struct Job* job, int numDevices){
+void request_devices(int jobNum, int numDevices){
+	for(int i=0; i<numJobs; i++){
+		if(all_jobs[i]->number == jobNum){
+			if(all_jobs[i]->status == 'R'){
+				(all_jobs[i]->maxDemand < availableDevices) ?
+						availableDevices -= all_jobs[i]->maxDemand:
+						printf("not enough devices available \n");
+			}else{
+				printf("job %d is not in ready queue; request ignored \n", jobNum);
+			}
+		}
+	}
 
 }
 
-void release_devices(struct Job* job, int numDevices){
-
+void release_devices(int jobNum, int numDevices){
+	for(int i=0; i<numJobs; i++){
+		if(all_jobs[i]->number == jobNum){
+			if(all_jobs[i]->status == 'T'){
+				availableDevices += numDevices;
+			}else{
+				printf("release is invalid, release ignored \n");
+			}
+		}
+	}
 }
 
 /*struct Job* pick_from_holding(){
@@ -189,7 +219,6 @@ void release_devices(struct Job* job, int numDevices){
 }*/
 
 void jobScheduler(struct Job *job){
-	printf("In job scheduler \n");
 	if(job->memUnits > mainMemSize || job->maxDemand > numSerialDevices){//reject the job
 		printf("Job needs too much memory or too many devices for the system, rejected");
 		//pop off holding queue
@@ -246,12 +275,14 @@ void terminateJob(struct Job *job){
 
 void print_all_jobs(){
 	for(int i=0; i<numJobs; i++){
+		printf(all_jobs[i]->number);
 		printf(all_jobs[i]->status);
 	}
 }
 
 void print_queue(struct Job *job){
 	while(job->next_Job != NULL){
+		printf(job->number);
 		printf(job->status);
 		job = job->next_Job;
 	}
@@ -261,14 +292,33 @@ int main(void){
 	//start_system(9, 45, 12, 1);
 	//create_new_job(10, 5, 4, 3, 1);
 	start_system(1, 35, 12, 4);
-	create_new_job(3, 20, 5, 10, 1);
-	create_new_job(4, 30, 2, 12, 2);
-	create_new_job(9, 10, 8, 4, 1);
+	create_new_job(1, 3, 20, 5, 10, 1);
+	create_new_job(2, 4, 30, 2, 12, 2);
+	create_new_job(3, 9, 10, 8, 4, 1);
+
+	request_devices(1, 5);
+
+	create_new_job(4, 13, 20, 4, 11, 2);
+
+	request_devices(3, 2);
+
+	create_new_job(5, 24, 20, 10, 9, 1);
+	/*
+	jobScheduler(all_jobs[4]);
+
+	create_new_job(6, 25, 20, 4, 12, 2);
+	jobScheduler(all_jobs[5]);*/
+
+	printf("\n ------------------ \n");
+	printf("printing all jobs \n");
+	printf("\n ------------------ \n");
 
 	for(int i=0; i<numJobs; i++){
-		printf("printing job %d: ", i);
-		jobScheduler(all_jobs[i]);
+		printf("\nprinting job %d", all_jobs[i]->number);
+		printf("\njob status: %c \n", all_jobs[i]->status);
+		//jobScheduler(all_jobs[i]);
 	}
+
 	return 0;
 }
 
