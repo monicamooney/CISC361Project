@@ -22,7 +22,6 @@ struct Job{
 	char status; //status of job (W = Waiting, H = Holding, R = Ready, J = Rejected, E = Executing, T = Terminated_
 	struct Job* next_Job; //next job
 	struct Job* prev_Job; //previous job
-	// May not need those ^ pointers since each queue is a linked list, tbd
 };
 
 //Global variables, used to initiate system requirements
@@ -92,6 +91,42 @@ void create_new_job(int time, int memUnits, int maxDemand, int timeRun, int prio
 	printf("New job created \n");
 }
 
+void first_in_first_out(struct Job *job, struct Job *queueRoot){
+	struct Job *tmp = queueRoot;
+	while(tmp->next_Job != NULL){
+		tmp = tmp->next_Job;
+	}
+	tmp->next_Job = job;
+	job->prev_Job = tmp;
+	job->next_Job = NULL;
+	printf("added to the end of the fifo queue \n");
+}
+
+void shortest_job_first(struct Job *job, struct Job *queueRoot){
+	struct Job *tmp = queueRoot;
+	if(job->timeRun < tmp->timeRun){
+		job->next_Job = tmp;
+		tmp->prev_Job = job;
+		printf("holding queue 1 is empty \n");
+	}else if(job->timeRun > tmp->timeRun){
+		while(job->timeRun > tmp->timeRun){
+			tmp = tmp->next_Job;
+		}
+		struct Job *tmp2 = tmp->next_Job;
+		tmp->next_Job = job;
+		job->prev_Job = tmp;
+		job->next_Job = tmp2;
+		tmp2->prev_Job = job;
+		printf("moved to the right place in holding queue 1 \n");
+		//move tmp until right timeRun
+	}else{
+		//timeRun and priorities are equal, FIFO
+		first_in_first_out(job, queueRoot);
+		printf("used fifo for holding queue 1 \n");
+	}
+
+}
+
 void move_to_holding_q1(struct Job *job){
 	if(root_job_holding1 == NULL){
 		printf("root_job_holding1 is null \n");
@@ -99,11 +134,7 @@ void move_to_holding_q1(struct Job *job){
 		root_job_holding1->next_Job = NULL;
 		root_job_holding1->prev_Job = NULL;
 	}else{
-		struct Job *tmp = root_job_holding1;
-		while(tmp->next_Job != NULL){
-			tmp = tmp->next_Job;
-		}
-		tmp->next_Job = job;
+		shortest_job_first(job, root_job_holding1);
 	}
 	printf("added to holding queue 1 \n");
 }
@@ -115,11 +146,7 @@ void move_to_holding_q2(struct Job *job){
 		root_job_holding2->next_Job = NULL;
 		root_job_holding2->prev_Job = NULL;
 	}else{
-		struct Job *tmp = root_job_holding2;
-		while(tmp->next_Job != NULL){
-			tmp = tmp->next_Job;
-		}
-		tmp->next_Job = job;
+		first_in_first_out(job, root_job_holding2);
 	}
 	printf("added to holding queue 2 \n");
 }
@@ -139,6 +166,7 @@ void move_to_ready_queue(struct Job *job){
 		tmp->next_Job = job;
 		job->prev_Job = tmp;
 	}
+	availableMainMem -= job->memUnits;
 	printf("added to ready queue \n");
 }
 
@@ -153,6 +181,12 @@ void request_devices(struct Job* job, int numDevices){
 void release_devices(struct Job* job, int numDevices){
 
 }
+
+/*struct Job* pick_from_holding(){
+	struct Job* temp_hq1 = root_job_holding1;
+	struct Job* temp_hq2 = root_job_holding2;
+
+}*/
 
 void jobScheduler(struct Job *job){
 	printf("In job scheduler \n");
@@ -210,10 +244,23 @@ void terminateJob(struct Job *job){
 	}
 }*/
 
+void print_all_jobs(){
+	for(int i=0; i<numJobs; i++){
+		printf(all_jobs[i]->status);
+	}
+}
+
+void print_queue(struct Job *job){
+	while(job->next_Job != NULL){
+		printf(job->status);
+		job = job->next_Job;
+	}
+}
+
 int main(void){
 	//start_system(9, 45, 12, 1);
 	//create_new_job(10, 5, 4, 3, 1);
-	start_system(1, 200, 12, 4);
+	start_system(1, 35, 12, 4);
 	create_new_job(3, 20, 5, 10, 1);
 	create_new_job(4, 30, 2, 12, 2);
 	create_new_job(9, 10, 8, 4, 1);
