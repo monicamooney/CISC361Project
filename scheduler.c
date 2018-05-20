@@ -297,7 +297,7 @@ void procScheduler(struct Job *job){ //should get passed root of ready queue
 		for(int q = timeSlice; q > 0; q--){//decr remaining time by quantum; incr total time by quantum
 			if(job->remainingTime > 0){
 				job->remainingTime--;
-				sysTime--;
+				sysTime++;
 			}
 			else
 				q = 0;
