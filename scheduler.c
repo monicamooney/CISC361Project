@@ -12,6 +12,9 @@
 // this is just defined for testing purposes
 #define MAX_NUM_JOBS 25
 
+// Global time variable
+int sysTime = 0;
+
 //define Job (before being processed)
 struct Job{
 	int number; //job number (identifier)
@@ -19,6 +22,7 @@ struct Job{
 	int memUnits; //mem units required
 	int maxDemand; //max device demand
 	int timeRun; //execution duration
+	int remainingTime; // remaining service time; decr by quantum in Round Robin
 	int priority; //priority (1 or 2)
 	char status; //status of job (W = Waiting, H = Holding, R = Ready, J = Rejected, E = Executing, T = Terminated_
 	struct Job* next_Job; //next job
@@ -275,6 +279,33 @@ void terminateJob(struct Job *job){
 		}
 	}*/
 }
+
+
+void procScheduler(struct Job *job){ //should get passed root of ready queue
+	//if not enough devices, stick in wait queue
+	//if enough, execute for timeSlice then move to next
+
+	// TODO Deal with getting Device Request input
+	while(job != NULL){
+		/*
+		 * If there's less time left to complete the process
+		 * then it'll only decrement the remainingTime and increment the total time
+		 * the right amount
+		 * e.g. If there are 2 secs left and there's a Q = 4, it'll move to the next
+		 * job after 2 secs instead of 4.
+		 */
+		for(int q = timeSlice; q > 0; q--){//decr remaining time by quantum; incr total time by quantum
+			if(job->remainingTime > 0){
+				job->remainingTime--;
+				sysTime--;
+			}
+			else
+				q = 0;
+		}
+		job = job->next_Job;
+	}
+}
+
 
 void print_all_jobs(){
 	for(int i=0; i<numJobs; i++){
