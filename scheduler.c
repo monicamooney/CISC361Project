@@ -27,7 +27,7 @@ struct Job{
 	int timeRun; //execution duration
 	int remainingTime; // remaining service time; decr by quantum in Round Robin
 	int priority; //priority (1 or 2)
-	char status; //status of job (W = Waiting, H = Holding, R = Ready, J = Rejected, E = Executing, T = Terminated_
+	char status; //status of job (W = Waiting, H = Holding, R = Ready, J = Rejected, E = Executing, T = Terminated
 	struct Job* next_Job; //next job
 	struct Job* prev_Job; //previous job
 };
