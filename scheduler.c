@@ -8,12 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "jsmn.h"
 
 // this is just defined for testing purposes
 #define MAX_NUM_JOBS 25
 
-// Global time variable
-int sysTime = 0;
+#define JSON_FILE_PATH "../sample_input.json"
+#define BUFFER_SIZE 5000
+#define MAX_TOKEN_COUNT 128
+
 
 //define Job (before being processed)
 struct Job{
@@ -30,6 +33,7 @@ struct Job{
 };
 
 //Global variables, used to initiate system requirements
+int sysTime = 0; //current time in system
 int numJobs; //count of all jobs in system
 int numWaiting; //number of jobs in waiting queue
 int numHolding; //number of jobs in holding 1 and holding 2
@@ -322,9 +326,11 @@ void print_queue(struct Job *job){
 	}
 }
 
+
+
 int main(void){
-	//start_system(9, 45, 12, 1);
-	//create_new_job(10, 5, 4, 3, 1);
+	start_system(9, 45, 12, 1);
+	create_new_job(10, 5, 4, 3, 1);
 	start_system(1, 35, 12, 4);
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
@@ -346,6 +352,7 @@ int main(void){
 		printf("\nprinting job %d", all_jobs[i]->number);
 		printf("\njob status: %c \n", all_jobs[i]->status);
 	}
+
 	return 0;
 }
 
