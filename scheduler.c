@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "jsmn.h"
+
+#include "C:/cygwin/usr/include/stdio.h"
+#include "C:/cygwin/usr/include/stdlib.h"
 
 // this is just defined for testing purposes
 #define MAX_NUM_JOBS 25
@@ -21,13 +23,16 @@
 //define Job (before being processed)
 struct Job{
 	int number; //job number (identifier)
-	int time; //time job arrives
+	int startTime; //time job arrives
 	int memUnits; //mem units required
 	int maxDemand; //max device demand
 	int timeRun; //execution duration
 	int remainingTime; // remaining service time; decr by quantum in Round Robin
 	int priority; //priority (1 or 2)
 	char status; //status of job (W = Waiting, H = Holding, R = Ready, J = Rejected, E = Executing, T = Terminated
+	int finishTime; //time that the job finished
+	int turnaround; //if job is finished the turnaround time (0 if unfinished)
+	int w_turnaround; //if job is finished the weighted turnaround time (0 if unfinished)
 	struct Job* next_Job; //next job
 	struct Job* prev_Job; //previous job
 };
@@ -61,7 +66,7 @@ struct Job* root_job_holding2; //first job in holding queue2
 struct Job* all_jobs[MAX_NUM_JOBS]; //array to keep track of every job + status in system
 
 //initialize the system from user input
-void start_system(int time, int memSize, int serialDevices, int quantum){
+void start_system(int simStart, int memSize, int serialDevices, int quantum){
 
 	//all initialized to 0 (no jobs)
 	numJobs = 0;
@@ -69,7 +74,7 @@ void start_system(int time, int memSize, int serialDevices, int quantum){
 	numReady = 0;
 
 	//function parameters will be from user input
-	simStartTime = time;
+	simStartTime = simStart;
 	mainMemSize = memSize;
 	availableMainMem = mainMemSize;
 	numSerialDevices = serialDevices;
@@ -89,14 +94,18 @@ void start_system(int time, int memSize, int serialDevices, int quantum){
 }
 
 //create a new job from user input
-void create_new_job(int jobNum, int time, int memUnits, int maxDemand, int timeRun, int priority){
+void create_new_job(int jobNum, int startTime, int memUnits, int maxDemand, int timeRun, int priority){
 	struct Job* new_job = malloc(sizeof(*new_job));
 	new_job->number = jobNum;
-	new_job->time = time;
+	new_job->startTime = startTime;
 	new_job->memUnits = memUnits;
 	new_job->maxDemand = maxDemand;
 	new_job->timeRun = timeRun;
 	new_job->priority = priority;
+	new_job->finishTime = 0;
+	new_job->turnaround = 0;
+	new_job->w_turnaround = 0;
+
 	new_job->prev_Job = NULL;
 
 	all_jobs[numJobs] = new_job; //add to all jobs array
@@ -282,6 +291,17 @@ void terminateJob(struct Job *job){
 			executeJob(tmp);
 		}
 	}*/
+	//TURNAROUND TIMES
+	job->turnaround = calculateTurnaround(job);
+	job->w_turnaround = calculateWeightedTurnaround(job);
+}
+
+int calculateWeightedTurnaround(struct Job *job){
+	return((job->finishTime - job->startTime)/job->timeRun);
+}
+
+int calculateTurnaround(struct Job *job){
+	return(job->finishTime - job->startTime);
 }
 
 
@@ -330,7 +350,7 @@ void print_queue(struct Job *job){
 
 int main(void){
 	start_system(9, 45, 12, 1);
-	create_new_job(10, 5, 4, 3, 1);
+	create_new_job(10, 5, 5, 4, 3, 1);
 	start_system(1, 35, 12, 4);
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
