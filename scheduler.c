@@ -327,10 +327,9 @@ void print_queue(struct Job *job){
 }
 
 
-
 int main(void){
-	start_system(9, 45, 12, 1);
-	create_new_job(10, 5, 4, 3, 1);
+//	start_system(9, 45, 12, 1);
+//	create_new_job(10, 5, 4, 3, 1);
 	start_system(1, 35, 12, 4);
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
@@ -344,14 +343,44 @@ int main(void){
 	request_devices(5, 7);
 	release_devices(3, 2);
 
-	printf("\n ------------------ \n");
-	printf("printing all jobs \n");
-	printf("\n ------------------ \n");
+//	printf("\n ------------------ \n");
+//	printf("printing all jobs \n");
+//	printf("\n ------------------ \n");
+//
+//	for(int i=0; i<numJobs; i++){
+//		printf("\nprinting job %d", all_jobs[i]->number);
+//		printf("\njob status: %c \n", all_jobs[i]->status);
+//	}
 
-	for(int i=0; i<numJobs; i++){
-		printf("\nprinting job %d", all_jobs[i]->number);
-		printf("\njob status: %c \n", all_jobs[i]->status);
+	FILE * inputFile;
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+
+	inputFile = fopen("sample_input.txt", "r");
+	if (inputFile == NULL)
+		exit(EXIT_FAILURE);
+
+	int isConfigured = 0;
+	while((read = getline(&line, &len, inputFile)) != -1){ // change condition later
+
+
+		if(isConfigured == 0){
+			int firstChar = fgetc(inputFile);
+			printf("FIRSTTTTT %c", firstChar);
+			isConfigured = 1;
+		}
+
+
+//
+
+		printf("%s", line);
 	}
+
+	fclose(inputFile);
+	if(line)
+		free(line);
+	exit(EXIT_SUCCESS);
 
 	return 0;
 }
