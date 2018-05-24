@@ -372,19 +372,19 @@ void readInputFile(char * fileName){
 				int simStart = *strtok_res - '0';
 				printf("%d", simStart);
 
-//				strtok_res = strtok(NULL, " ");
-//				strtok_res2 = strtok(strtok_res, "=");
-//				//printf("%c", *strtok_res2);
-//				if(*strtok_res2 == 'M'){
-//					strtok_res2 = strtok(NULL, " ");
-//					int memSize = *strtok_res2 - '0';
-//					printf("%d", memSize);
-//				}
+				strtok_res = strtok(NULL, " ");
+				strtok_res2 = strtok(strtok_res, "=");
+				//printf("%c", *strtok_res2);
+				if(*strtok_res2 == 'M'){
+					strtok_res2 = strtok(NULL, " ");
+					int memSize = *strtok_res2 - '0';
+					printf("%d", memSize);
+				}
 
-//				strtok_res = strtok(NULL, " ");
-//				printf("%c", *strtok_res);
-//				strtok_res2 = strtok(strtok_res, "=");
-//				if(*strok_res2 == 'S'){
+				strtok_res = strtok(NULL, " ");
+//				strtok_res2 = strtok(NULL, "=");
+				printf("%c", *strtok_res);
+//				if(*strtok_res2 == 'S'){
 //					strtok_res2 = strtok(NULL, " ");
 //					int serialDevices = *strtok_res2 - '0';
 //					printf("%d", serialDevices);
