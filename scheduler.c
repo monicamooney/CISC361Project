@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "C:/cygwin/usr/include/stdio.h"
-#include "C:/cygwin/usr/include/stdlib.h"
+//#include "C:/cygwin/usr/include/stdio.h"
+//#include "C:/cygwin/usr/include/stdlib.h"
 
 // this is just defined for testing purposes
 #define MAX_NUM_JOBS 25
@@ -346,15 +346,75 @@ void print_queue(struct Job *job){
 	}
 }
 
+void readInputFile(char * fileName){
+	FILE * inputFile;
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+
+	inputFile = fopen(fileName, "r");
+	if (inputFile == NULL)
+		exit(EXIT_FAILURE);
+
+	if(read = getline(&line, &len, inputFile) != -1){ // change condition later
+		char * strtok_res;
+		char * strtok_res2;
+
+		strtok_res = strtok(line, " ");
+//		if(*strtok_res == 'C')
+//			printf("%c\n", *strtok_res);
+
+		while (strtok_res != NULL)
+		{
+			if(*strtok_res == 'C'){
+				printf("%c", *strtok_res);
+				strtok_res = strtok (NULL, " ");
+				int simStart = *strtok_res - '0';
+				printf("%d", simStart);
+
+//				strtok_res = strtok(NULL, " ");
+//				strtok_res2 = strtok(strtok_res, "=");
+//				//printf("%c", *strtok_res2);
+//				if(*strtok_res2 == 'M'){
+//					strtok_res2 = strtok(NULL, " ");
+//					int memSize = *strtok_res2 - '0';
+//					printf("%d", memSize);
+//				}
+
+//				strtok_res = strtok(NULL, " ");
+//				printf("%c", *strtok_res);
+//				strtok_res2 = strtok(strtok_res, "=");
+//				if(*strok_res2 == 'S'){
+//					strtok_res2 = strtok(NULL, " ");
+//					int serialDevices = *strtok_res2 - '0';
+//					printf("%d", serialDevices);
+//				}
+			}
+
+
+//			printf("%i", strtok_res);
+//			printf("%s", strtok_res);
+
+			strtok_res = strtok (NULL, " ");
+		}
+	}
+
+
+	fclose(inputFile);
+//	if(line)
+//		free(line);
+//	exit(EXIT_SUCCESS);
+}
+
 
 int main(void){
-<<<<<<< HEAD
+//<<<<<<< HEAD
 //	start_system(9, 45, 12, 1);
 //	create_new_job(10, 5, 4, 3, 1);
-=======
+//=======
 	start_system(9, 45, 12, 1);
 	create_new_job(10, 5, 5, 4, 3, 1);
->>>>>>> 3f5402225e7973831216ee7a315dc18a233912c2
+//>>>>>>> 3f5402225e7973831216ee7a315dc18a233912c2
 	start_system(1, 35, 12, 4);
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
@@ -377,35 +437,7 @@ int main(void){
 //		printf("\njob status: %c \n", all_jobs[i]->status);
 //	}
 
-	FILE * inputFile;
-	char * line = NULL;
-	size_t len = 0;
-	ssize_t read;
-
-	inputFile = fopen("sample_input.txt", "r");
-	if (inputFile == NULL)
-		exit(EXIT_FAILURE);
-
-	int isConfigured = 0;
-	while((read = getline(&line, &len, inputFile)) != -1){ // change condition later
-
-
-		if(isConfigured == 0){
-			int firstChar = fgetc(inputFile);
-			printf("FIRSTTTTT %c", firstChar);
-			isConfigured = 1;
-		}
-
-
-//
-
-		printf("%s", line);
-	}
-
-	fclose(inputFile);
-	if(line)
-		free(line);
-	exit(EXIT_SUCCESS);
+	readInputFile("sample_input.txt");
 
 	return 0;
 }
@@ -413,3 +445,4 @@ int main(void){
 
 
 
+;
