@@ -430,6 +430,7 @@ int main(void){
 		printf("\nprinting job %d", all_jobs[i]->number);
 		printf("\njob status: %c \n", all_jobs[i]->status);
 	}
+/*
 
 	// TEST 1
 	start_system(1, 200, 12, 4);
@@ -449,7 +450,8 @@ int main(void){
 		printf("\nprinting job %d", all_jobs[i]->number);
 		printf("\njob status: %c \n", all_jobs[i]->status);
 	}
-
+*/
+	/*
 	// TEST 2
 	start_system(1, 200, 12, 4);
 	create_new_job(1, 3, 120, 10, 10, 1);
@@ -479,6 +481,7 @@ int main(void){
 		printf("\njob status: %c \n", all_jobs[i]->status);
 	}
 
+*/
 
 
 	return 0;
