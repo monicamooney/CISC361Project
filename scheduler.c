@@ -361,36 +361,35 @@ void readInputFile(char * fileName){
 		char * strtok_res2;
 
 		strtok_res = strtok(line, " ");
-//		if(*strtok_res == 'C')
-//			printf("%c\n", *strtok_res);
 
 		while (strtok_res != NULL)
 		{
 			if(*strtok_res == 'C'){
-				printf("%c", *strtok_res);
+				printf("%s", strtok_res);
 				strtok_res = strtok (NULL, " ");
 				int simStart = *strtok_res - '0';
 				printf("%d", simStart);
 
 				strtok_res = strtok(NULL, " ");
-				strtok_res2 = strtok(strtok_res, "=");
-				//printf("%c", *strtok_res2);
-				if(*strtok_res2 == 'M'){
-					strtok_res2 = strtok(NULL, " ");
-					int memSize = *strtok_res2 - '0';
-					printf("%d", memSize);
-				}
 
-				strtok_res = strtok(NULL, " ");
+//				strtok_res2 = strtok(strtok_res, "=");
+//				printf("%s", strtok_res2);
+//				if(*strtok_res2 == 'M'){
+//					strtok_res2 = strtok(NULL, " ");
+//					int memSize = atoi(strtok_res2);
+//					printf("%d", memSize);
+//					printf("%s", strtok_res);
+//				}
+
+//				strtok_res = strtok(NULL, " ");
 //				strtok_res2 = strtok(NULL, "=");
-				printf("%c", *strtok_res);
+//				printf("%s", strtok_res);
 //				if(*strtok_res2 == 'S'){
 //					strtok_res2 = strtok(NULL, " ");
 //					int serialDevices = *strtok_res2 - '0';
 //					printf("%d", serialDevices);
 //				}
 			}
-
 
 //			printf("%i", strtok_res);
 //			printf("%s", strtok_res);
@@ -408,13 +407,8 @@ void readInputFile(char * fileName){
 
 
 int main(void){
-//<<<<<<< HEAD
-//	start_system(9, 45, 12, 1);
-//	create_new_job(10, 5, 4, 3, 1);
-//=======
-	start_system(9, 45, 12, 1);
-	create_new_job(10, 5, 5, 4, 3, 1);
-//>>>>>>> 3f5402225e7973831216ee7a315dc18a233912c2
+
+	// SAMPLE INPUT
 	start_system(1, 35, 12, 4);
 	create_new_job(1, 3, 20, 5, 10, 1);
 	create_new_job(2, 4, 30, 2, 12, 2);
@@ -427,6 +421,30 @@ int main(void){
 	request_devices(4, 4);
 	request_devices(5, 7);
 	release_devices(3, 2);
+	//external 9999
+
+	// TEST 1
+	start_system(1, 200, 12, 4);
+	create_new_job(1, 3, 120, 5, 10, 1);
+	create_new_job(2, 4, 70, 2, 12, 2);
+	create_new_job(3, 5, 100, 8, 4, 1);
+	create_new_job(4, 7, 1000, 5, 12, 2);
+	create_new_job(5, 8, 10, 8, 4, 1);
+	//external 10
+	//external 26
+
+	// TEST 2
+	start_system(1, 200, 12, 4);
+	create_new_job(1, 3, 120, 10, 10, 1);
+	create_new_job(2, 4, 70, 3, 12, 2);
+	request_devices(1, 10);
+	request_devices(2, 3);
+//	external event 8
+	release_devices(1, 4);
+	create_new_job(3, 10, 10, 8, 4, 1);
+
+
+
 
 //	printf("\n ------------------ \n");
 //	printf("printing all jobs \n");
