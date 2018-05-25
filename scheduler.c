@@ -422,6 +422,14 @@ int main(void){
 	request_devices(5, 7);
 	release_devices(3, 2);
 	//external 9999
+	printf("\n ------------------ \n");
+	printf("printing all jobs \n");
+	printf("\n ------------------ \n");
+
+	for(int i=0; i<numJobs; i++){
+		printf("\nprinting job %d", all_jobs[i]->number);
+		printf("\njob status: %c \n", all_jobs[i]->status);
+	}
 
 	// TEST 1
 	start_system(1, 200, 12, 4);
@@ -433,6 +441,15 @@ int main(void){
 	//external 10
 	//external 26
 
+	printf("\n ------------------ \n");
+	printf("printing all jobs \n");
+	printf("\n ------------------ \n");
+
+	for(int i=0; i<numJobs; i++){
+		printf("\nprinting job %d", all_jobs[i]->number);
+		printf("\njob status: %c \n", all_jobs[i]->status);
+	}
+
 	// TEST 2
 	start_system(1, 200, 12, 4);
 	create_new_job(1, 3, 120, 10, 10, 1);
@@ -440,20 +457,28 @@ int main(void){
 	request_devices(1, 10);
 	request_devices(2, 3);
 //	external event 8
+	printf("\n ------------------ \n");
+	printf("printing all jobs \n");
+	printf("\n ------------------ \n");
+
+	for(int i=0; i<numJobs; i++){
+		printf("\nprinting job %d", all_jobs[i]->number);
+		printf("\njob status: %c \n", all_jobs[i]->status);
+	}
+
 	release_devices(1, 4);
 	create_new_job(3, 10, 10, 8, 4, 1);
 
 
+	printf("\n ------------------ \n");
+	printf("printing all jobs \n");
+	printf("\n ------------------ \n");
 
+	for(int i=0; i<numJobs; i++){
+		printf("\nprinting job %d", all_jobs[i]->number);
+		printf("\njob status: %c \n", all_jobs[i]->status);
+	}
 
-//	printf("\n ------------------ \n");
-//	printf("printing all jobs \n");
-//	printf("\n ------------------ \n");
-//
-//	for(int i=0; i<numJobs; i++){
-//		printf("\nprinting job %d", all_jobs[i]->number);
-//		printf("\njob status: %c \n", all_jobs[i]->status);
-//	}
 
 
 	return 0;
