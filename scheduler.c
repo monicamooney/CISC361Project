@@ -346,7 +346,7 @@ void print_queue(struct Job *job){
 	}
 }
 
-void readInputFile(char * fileName){
+/*void readInputFile(char * fileName){
 	FILE * inputFile;
 	char * line = NULL;
 	size_t len = 0;
@@ -403,7 +403,7 @@ void readInputFile(char * fileName){
 //	if(line)
 //		free(line);
 //	exit(EXIT_SUCCESS);
-}
+}*/
 
 
 int main(void){
@@ -455,7 +455,6 @@ int main(void){
 //		printf("\njob status: %c \n", all_jobs[i]->status);
 //	}
 
-	readInputFile("sample_input.txt");
 
 	return 0;
 }
